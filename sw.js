@@ -1,4 +1,4 @@
-const CACHE = 'daily-grace-v1';
+const CACHE = 'daily-grace-v2';
 const STATIC = [
   './',
   './index.html',
