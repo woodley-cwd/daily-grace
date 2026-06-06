@@ -1,6 +1,6 @@
 import { generateQuoteId } from './storage.js';
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-sonnet-4-6';
 const SYSTEM = 'You are a quote curator for a devotional app used by elderly women who love faith, family, and encouragement. Return ONLY valid JSON — no markdown, no explanation. Generate warm, uplifting quotes.';
 
 export function getApiKey() {
