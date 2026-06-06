@@ -1,7 +1,7 @@
 import { generateQuoteId } from './storage.js';
 
 const MODEL = 'claude-sonnet-4-6';
-const SYSTEM = 'You are a quote curator for a devotional app used by elderly women who love faith, family, and encouragement. Return ONLY valid JSON — no markdown, no explanation. Generate warm, uplifting quotes.';
+const SYSTEM = 'You are a quote curator for a warm, uplifting quotes app. Return ONLY valid JSON — no markdown, no explanation. Follow the category instructions exactly.';
 
 export function getApiKey() {
   return localStorage.getItem('dg_api_key') || '';
@@ -44,14 +44,26 @@ async function callClaude(userMessage) {
   return quote;
 }
 
+const CATEGORY_PROMPTS = {
+  'Bible': 'Generate a warm, uplifting Bible scripture or quote from a Christian author. This is the ONLY category that should be religious or scripture-based.',
+  'Inspirational': 'Generate a secular inspirational quote from a well-known figure (e.g. Maya Angelou, Helen Keller, Einstein, Oprah). NO religious or Bible content.',
+  'Motivational': 'Generate a secular motivational quote about achievement, perseverance, or personal growth. NO religious or Bible content. Think coaches, athletes, leaders, authors.',
+  'Family and Love': 'Generate a warm quote about family, love, relationships, or parenting. NO religious or Bible content. Keep it heartfelt and human.',
+  'Faith and Hope': 'Generate a spiritual quote about hope, inner strength, or belief — can reference God, the universe, or a higher power in a broad sense, but NOT Bible scripture and NOT tied to any specific religion.',
+  'Encouragement': 'Generate a cheerful, uplifting quote to brighten someone\'s day. NO religious content. Think warm, feel-good, human encouragement.',
+};
+
 export async function fetchDailyQuote() {
+  const categories = Object.keys(CATEGORY_PROMPTS);
+  const category = categories[Math.floor(Math.random() * categories.length)];
   return callClaude(
-    'Generate an uplifting quote from one of these categories: Bible, Inspirational, Motivational, Family and Love, Faith and Hope, or Encouragement. Return JSON: {"text":"...","source":"...","category":"...","theme":"..."} where theme is one of: faith, nature, family, strength, hope, light, peace'
+    `${CATEGORY_PROMPTS[category]} Return JSON: {"text":"...","source":"...","category":"${category}","theme":"..."} where theme is one of: faith, nature, family, strength, hope, light, peace`
   );
 }
 
 export async function fetchCategoryQuote(category) {
+  const instruction = CATEGORY_PROMPTS[category] || CATEGORY_PROMPTS['Inspirational'];
   return callClaude(
-    `Generate an uplifting quote specifically from the "${category}" category. Return JSON: {"text":"...","source":"...","category":"...","theme":"..."} where theme is one of: faith, nature, family, strength, hope, light, peace`
+    `${instruction} Return JSON: {"text":"...","source":"...","category":"${category}","theme":"..."} where theme is one of: faith, nature, family, strength, hope, light, peace`
   );
 }
